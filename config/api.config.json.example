@@ -1,0 +1,13 @@
+{
+  "port"   : 7111,
+  "ripple": {
+    "servers": ["wss://s-west.ripple.com:443"]
+  },
+  "hbase" : {
+    "logLevel" : 2,
+    "prefix" : "test_",
+    "servers" : [
+      {"host" : "", "port": 9090}
+    ]
+  }
+}
