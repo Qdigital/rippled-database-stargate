@@ -1,0 +1,25 @@
+{
+  "port": 7112,
+  "logLevel": 2,
+  "hbase": {
+    "prefix": "",
+    "hosts": ["hbase"],
+    "timeout": 60000,
+    "max_sockets": 1,
+    "min_sockets": 1,
+    "servers": [
+      {
+        "host": "hbase",
+        "port": 9090
+      }
+    ]
+  },
+  "hbase-rest": {
+    "host": "hbase",
+    "port": 8080
+  },
+  "ripple": {
+    "server": "wss://localhost:443"
+  },
+  "validators-config": "./test/validators.config.json"
+}
