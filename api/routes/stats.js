@@ -1,0 +1,147 @@
+'use strict';
+
+var Logger = require('../../lib/logger');
+var log = new Logger({scope: 'stats'});
+var smoment = require('../../lib/smoment');
+var utils = require('../../lib/utils');
+var hbase = require('../../lib/hbase')
+var families = ['type','result','metric'];
+
+
+/**
+ * Stats
+ */
+
+var Stats = function(req, res) {
+  var options;
+
+  /**
+   * prepareOptions
+   */
+
+  function prepareOptions() {
+    var options = {
+      family: (req.params.family || req.query.family || '').toLowerCase(),
+      start: smoment(req.query.start || '2013-01-01'),
+      end: smoment(req.query.end),
+      descending: (/true/i).test(req.query.descending) ? true : false,
+      interval: req.query.interval || 'day',
+      limit: req.query.limit || 200,
+      marker: req.query.marker,
+      format: (req.query.format || 'json').toLowerCase(),
+    };
+
+    if (req.params.metric) {
+      options.metrics = [options.family + ':' + req.params.metric];
+    } else if (req.query.metrics) {
+      options.metrics = req.query.metrics.split(',');
+      if (options.family) {
+        options.metrics.forEach(function(metric, i) {
+          options.metrics[i] = options.family + ':' + metric;
+        });
+      } else {
+        return {error: 'family is required', code: 400};
+      }
+    }
+
+    if (!options.start) {
+      return {error: 'invalid start date format', code: 400};
+    } else if (!options.end) {
+      return {error: 'invalid end date format', code: 400};
+    }
+
+    if (options.family && families.indexOf(options.family) === -1) {
+      return {error: 'invalid family, use: ' + families.join(', '), code: 400};
+    }
+
+    if (isNaN(options.limit)) {
+      options.limit = 200;
+
+    } else if (options.limit > 1000) {
+      options.limit = 1000;
+    }
+
+    return options;
+  }
+
+  /**
+  * errorResponse
+  * return an error response
+  * @param {Object} err
+  */
+
+  function errorResponse(err) {
+    log.error(err.error || err);
+    if (err.code && err.code.toString()[0] === '4') {
+      res.status(err.code).json({
+        result: 'error',
+        message: err.error
+      });
+    } else {
+      res.status(500).json({
+        result: 'error',
+        message: 'unable to retrieve stats'
+      });
+    }
+  }
+
+  /**
+  * successResponse
+  * return a successful response
+  * @param {Object} payments
+  */
+
+  function successResponse(resp) {
+    var filename = 'stats';
+
+    if (resp.marker) {
+      utils.addLinkHeader(req, res, resp.marker);
+    }
+
+    if (options.format === 'csv') {
+      if (options.family) {
+        filename += ' ' + options.family;
+      }
+
+      if (options.metrics) {
+        filename += '-' + options.metrics.join('-');
+      }
+
+      if (!options.family && !options.metric) {
+        resp.rows.forEach(function(r, i) {
+          resp.rows[i] = utils.flattenJSON(r);
+        });
+      }
+
+      res.csv(resp.rows, filename + '.csv');
+
+    } else {
+      res.json({
+        result: 'success',
+        count: resp.rows.length,
+        marker: resp.marker,
+        stats: resp.rows
+      });
+    }
+  }
+
+  options = prepareOptions();
+
+  if (options.error) {
+    errorResponse(options);
+    return;
+
+  } else {
+    log.info(options.start.format(), '-', options.end.format());
+
+    hbase.getStats(options, function(err, resp) {
+      if (err) {
+        errorResponse(err);
+      } else {
+        successResponse(resp);
+      }
+    });
+  }
+};
+
+module.exports = Stats
