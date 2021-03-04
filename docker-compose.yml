@@ -1,0 +1,13 @@
+webapp:
+  build: .
+  volumes:
+    - .:/usr/src/app
+  ports:
+    - "7111:7111"
+  links:
+    - hbase
+    - redis
+hbase:
+  image: bwilsonripple/hbase
+redis:
+  image: redis
