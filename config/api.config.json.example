@@ -1,0 +1,17 @@
+{
+  "port"   : 7111,
+  "postgres" : {
+    "host"     : "127.0.0.1",
+    "user"     : "",
+    "password" : "",
+    "database" : "ripple_data",
+    "charset"  : "utf8"
+  },
+  "hbase" : {
+    "logLevel" : 2,
+    "prefix" : "test_",
+    "servers" : [
+      {"host" : "", "port": 9090}
+    ]
+  }
+}
