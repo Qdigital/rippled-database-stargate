@@ -32,7 +32,7 @@
     "int64-buffer": "^0.1.1",
     "mocha": "2.2.5",
     "moment": "^2.9.0",
-    "nconf": "^0.6.9",
+    "nconf": "^0.12.0",
     "nice-json2csv": "^0.2.0",
     "nodemailer": "^1.4.0",
     "nodemon": "^1.2.1",
