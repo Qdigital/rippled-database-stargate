@@ -30,7 +30,7 @@
     "express": "^4.9.3",
     "hbase": "^0.1.7",
     "int64-buffer": "^0.1.1",
-    "mocha": "2.2.5",
+    "mocha": "10.1.0",
     "moment": "^2.9.0",
     "nconf": "^0.6.9",
     "nice-json2csv": "^0.2.0",
