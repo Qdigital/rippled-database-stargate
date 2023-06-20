@@ -35,7 +35,7 @@
     "nconf": "^0.6.9",
     "nice-json2csv": "^0.2.0",
     "nodemailer": "^1.4.0",
-    "nodemon": "^1.2.1",
+    "nodemon": "^2.0.17",
     "ratelimiter": "^3.0.3",
     "redis": "^2.8.0",
     "request": "^2.39.0",
